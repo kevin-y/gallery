@@ -49,8 +49,7 @@ Add repositories to the /etc/apt/sources.list file:
 $ sudo vim /etc/apt/sources.list
 </code></pre>
 
-> deb http://nginx.org/packages/ubuntu/ precise nginx
-
+> deb http://nginx.org/packages/ubuntu/ precise nginx<br>
 > deb-src http://nginx.org/packages/ubuntu/ precise nginx
 
 Execute the following commands will install the latest version: 
@@ -91,4 +90,19 @@ Try accessing `localhost` with your browser, you should see the following page.
 
 ![Gallery Main Page](https://github.com/kevin-y/gallery-docs/blob/master/resources/images/gallery_main_page.png "Gallery Main Page")
  
+## Install MySQL
+Installing MySQL is pretty easy, just install through **apt repository**:
+<pre><code>
+$ sudo apt-get install -y mysql-server
+</code></pre>
+
+The following command is to check whether MySQL server is running on port 3306(by default):
+<pre><code>
+$ sudo lsof -i:3306
+</code></pre>
+
+<blockquote>
+COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME <br>
+mysqld  15580 mysql   10u  IPv4  63778      0t0  TCP localhost:mysql (LISTEN)
+</blockquote>>
 
