@@ -101,8 +101,74 @@ The following command is to check whether MySQL server is running on port 3306(b
 $ sudo lsof -i:3306
 </code></pre>
 
-<blockquote>
-COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME <br>
-mysqld  15580 mysql   10u  IPv4  63778      0t0  TCP localhost:mysql (LISTEN)
-</blockquote>>
+
+> COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME <br>
+> mysqld  15580 mysql   10u  IPv4  63778      0t0  TCP localhost:mysql (LISTEN)
+
+## Install Redis
+Before we start compiling redis source, we need to install gcc compiler if we haven't had one. The latest version is recommended. Here I am gonna install directly from the apt repository.
+<pre><code>
+$ sudo apt-get -y install gcc 
+</code></pre>
+
+Now, we begin to compile and install redis:
+<pre><code>
+$ wget http://download.redis.io/releases/redis-3.0.1.tar.gz
+$ tar -zxvf redis-3.0.1.tar.gz
+$ cd redis-3.0.1/
+$ cd deps && make hiredis lua jemalloc linenoise
+$ cd ..
+$ make
+</code></pre>
+
+If there's no error during compilation, then we could install and configure redis now:
+<pre><code>
+$ sudo mkdir /etc/redis
+$ sudo cp redis.conf /etc/redis/
+$ sudo mkdir -p /usr/local/redis/bin
+$ sudo cp src/redis-* /usr/local/redis/bin/
+$ sudo sysctl vm.overcommit_memory=1
+$ sudo groupadd redis
+$ sudo useradd -r -g redis redis
+$ sudo chown -R redis:redis /usr/local/redis/
+$ sudo mkdir /var/log/redis/
+$ sudo chown -R redis:redis /var/log/redis/
+</code></pre>
+
+Configure redis environment:
+<pre><code>
+$ sudo vim /etc/profile
+
+# Add the following lines:
+# Redis Environment
+REDIS_HOME=/usr/local/redis
+export PATH=$REDIS_HOME/bin:$PATH
+
+# makes it being effective immediately
+$ su - 
+# source /etc/profile  #You may need root to run redis server
+</code></pre>
+
+Comment out `save` directives in `redis.conf` to disable persistence mechanism, because we just use redis as a cache server, it's okay if you don't do this:
+<pre><code>
+$ sudo vim /etc/redis/redis.conf
+</code></pre>
+
+> #save 900 1 <br>
+> #save 300 10 <br>
+> #save 60 10000 <br>
+> logfile /var/log/redis/redis.log <br>
+
+Run server:
+<pre><code>
+$ su -
+# redis-server /etc/redis/redis.conf
+</code></pre>
+
+Connet to the server:
+<pre><code>
+$ redis-cli -p 6379
+127.0.0.1:6379> 
+</code></pre>
+
 
