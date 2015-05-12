@@ -24,15 +24,15 @@ It's pretty easy to run all the services on windows OS.
 <ol>
 	<li>Windows XP, Vista, 7, 8, 8.1 and 10, both are okay, I'm using windows 7</li>
 	<li>Java JDK 1.6+, 1.7+ is recommended, because I will explore some features that only come up with 1.7.</li>
-	<li>**[MongoDB](https://www.mongodb.org/downloads)** , latest version is recommended, because it has a lot of optimizations, but be aware there are two storage engines, **MMAPv1** and **WiredTiger**, they're not compatible with each other. The former is available in previous versions, and the later only in 3.0. I am currently using 2.6.x and will later switch to 3.0 and try WiredTiger. Well, 3.0 has a finer granularity of locks. See **[Release Notes for MongoDB 3.0](http://docs.mongodb.org/manual/release-notes/3.0/)**. </li>
+	<li>**[MongoDB](https://www.mongodb.org/downloads)** , latest version is recommended, because it has a lot of optimizations, but be aware there are two storage engines, **MMAPv1** and **WiredTiger**, they're not compatible with each other. The former is available in previous versions, and the later only in 3.0. I am currently using 2.6.x and will later switch to 3.0 and try WiredTiger. Well, 3.0 has a finer granularity of locks. See **["Release Notes for MongoDB 3.0"](http://docs.mongodb.org/manual/release-notes/3.0/)**. </li>
 	<li>Erlang runtime enviroment, OTP 16B02+</li>
 	<li>RabbitMQ server, just use the latest version</li>
-	<li>Redis key-value server, well, redis windows version is not recommended for running in production environments, but for development purpose, it would not cause too much harm. I am using 2.18.19.1, see **[Redis 2.18.19.1](https://github.com/MSOpenTech/redis/releases)**</li>
+	<li>Redis key-value server, well, redis windows version is not recommended for running in production environments, but for development purpose, it would not cause too much harm. I am using 2.18.19.1, see **["Redis 2.18.19.1"](https://github.com/MSOpenTech/redis/releases)**</li>
 	<li>Tomcat 7.x+</li>
 	<li>MySQL 5.x, the latest version is recommended</li>
 	<li>Development tools, I am using maven to manage the project, so any IDE supports maven will work fine.</li>
 </ol> 
 
 ## For Linux
-The requirements is the same as on windows platforms, I will later write a detailed installation doc for both linux and window platforms.
+The requirements are the same as on windows platforms, I will later write a detailed installation doc for both linux and window platforms.
 
