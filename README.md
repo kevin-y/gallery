@@ -49,8 +49,9 @@ Add repositories to the /etc/apt/sources.list file:
 $ sudo vim /etc/apt/sources.list
 </code></pre>
 
-> deb <pre>http://nginx.org/packages/ubuntu/ precise</pre> nginx<br>
-> deb-src <pre>http://nginx.org/packages/ubuntu/ precise</pre> nginx
+> deb http://nginx.org/packages/ubuntu/ precise nginx
+
+> deb-src http://nginx.org/packages/ubuntu/ precise nginx
 
 Execute the following commands will install the latest version: 
 <pre><code>
