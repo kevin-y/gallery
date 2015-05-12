@@ -152,12 +152,17 @@ $ su -
 Comment out `save` directives in `redis.conf` to disable persistence mechanism, because we just use redis as a cache server, it's okay if you don't do this:
 <pre><code>
 $ sudo vim /etc/redis/redis.conf
+
+# turn off save directives
+#save 900 1 <br>
+#save 300 10 <br>
+#save 60 10000 <br>
+
+# change log file location
+logfile /var/log/redis/redis.log <br>
 </code></pre>
 
-> #save 900 1 <br>
-> #save 300 10 <br>
-> #save 60 10000 <br>
-> logfile /var/log/redis/redis.log <br>
+
 
 Run server:
 <pre><code>
