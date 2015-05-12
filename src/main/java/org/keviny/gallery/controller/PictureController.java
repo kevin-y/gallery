@@ -9,8 +9,8 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
-import org.keviny.gallery.common.FileMetadata;
-import org.keviny.gallery.common.FileWrapper;
+import org.keviny.gallery.amqp.RabbitMessageService;
+import org.keviny.gallery.common.*;
 import org.keviny.gallery.common.exception.ErrorCode;
 import org.keviny.gallery.common.exception.ErrorCodeException;
 import org.keviny.gallery.mongo.repository.PictureRepository;
@@ -37,6 +37,8 @@ public class PictureController {
 
 	@Autowired
 	private PictureRepository pictureRepository;
+	@Autowired
+	private RabbitMessageService rabbitMessageService;
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -67,6 +69,15 @@ public class PictureController {
 		if (meta.getFid() == null) {
 			throw new ErrorCodeException(ErrorCode.FILE_UPLOAD_FAILED);
 		}
+
+		RabbitMessage message = new RabbitMessage();
+		message.setExchange(Exchange.IMAGE);
+		message.setRoutingKey(RoutingKey.NEW_IMAGE);
+		message.put("fid", meta.getFid());
+		message.put("filename", meta.getFilename());
+
+		rabbitMessageService.publish(message);
+
 		return new ResponseEntity<FileMetadata>(meta, status);
 	}
 

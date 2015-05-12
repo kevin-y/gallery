@@ -170,10 +170,36 @@ $ su -
 # redis-server /etc/redis/redis.conf
 </code></pre>
 
-Connet to the server:
+Connect to the server:
 <pre><code>
 $ redis-cli -p 6379
 127.0.0.1:6379> 
 </code></pre>
+
+## Install RabbitMQ
+<pre><code>
+$ sudo echo "deb http://www.rabbitmq.com/debian/ testing main" >> /etc/apt/sources.list
+$ wget https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+$ sudo apt-key add rabbitmq-signing-key-public.asc
+$ sudo apt-get update
+$ sudo apt-get install rabbitmq-server
+</code></pre>
+
+## Install MongoDB
+Just follow along with this tutorial: 
+[Install MongoDB on Ubuntu](http://docs.mongodb.org/master/tutorial/install-mongodb-on-ubuntu/)
+
+<blockquote>
+ <b>Note:</b><br>
+It may have a warning message saying: WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'<br>
+
+You can eliminate this message by following these commands:<br>
+
+$ su - <br>
+# echo never > /sys/kernel/mm/transparent_hugepage/defrag <br>
+</blockquote>
+
+## Install Tomcat 7.x+
+Just download the binary archive from [Apache Tomcat](http://tomcat.apache.org/download-70.cgi), and extract it to some directory.
 
 
