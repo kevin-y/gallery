@@ -24,7 +24,7 @@ It's pretty easy to run all the services on windows OS.
 <ol>
 	<li>Windows XP, Vista, 7, 8, 8.1 and 10, both are okay, I'm using windows 7</li>
 	<li>Java JDK 1.6+, 1.7+ is recommended, because I will explore some features that only come up with 1.7.</li>
-	<li><a href="https://www.mongodb.org/downloads" target="_blank">MongoDB</a> , latest version is recommended, because it has a lot of optimizations, but be aware there are two storage engines, **MMAPv1** and **WiredTiger**, they're not compatible with each other. The former is available in previous versions, and the later only in 3.0. I am currently using 2.6.x and will later switch to 3.0 and try WiredTiger. Well, 3.0 has a finer granularity of locks. See <a href="http://docs.mongodb.org/manual/release-notes/3.0/" target="_blank">Release Notes for MongoDB</a>. </li>
+	<li><a href="https://www.mongodb.org/downloads" target="_blank">MongoDB</a> , latest version is recommended, because it has a lot of optimizations, but be aware there are two storage engines, <b>MMAPv1</b> and <b>WiredTiger</b>, they're not compatible with each other. The former is available in previous versions, and the later only in 3.0. I am currently using 2.6.x and will later switch to 3.0 and try WiredTiger. Well, 3.0 has a finer granularity of locks. See <a href="http://docs.mongodb.org/manual/release-notes/3.0/" target="_blank">Release Notes for MongoDB</a>. </li>
 	<li>Erlang runtime enviroment, OTP 16B02+</li>
 	<li>RabbitMQ server, just use the latest version</li>
 	<li>Redis key-value server, well, redis windows version is not recommended for running in production environments, but for development purpose, it would not cause too much harm. I am using 2.18.19.1, see <a href="https://github.com/MSOpenTech/redis/releases" target="_blank">Redis 2.18.19.1</a></li>
@@ -34,7 +34,7 @@ It's pretty easy to run all the services on windows OS.
 </ol> 
 
 ## For Linux
-The requirements are the same as on windows platforms, I will later write a detailed installation doc for both linux and window platforms.
+The requirements are the same as on windows platforms, I will later write a detailed installation doc for both linux and window platforms.(TO BE CONTINUED)
 
 ## Install Nginx (Ubuntu 12.04 64bit)
 
@@ -49,8 +49,8 @@ Add repositories to the /etc/apt/sources.list file:
 $ sudo vim /etc/apt/sources.list
 </code></pre>
 
-> deb http://nginx.org/packages/ubuntu/ precise nginx
-> deb-src http://nginx.org/packages/ubuntu/ precise nginx
+> deb <pre>http://nginx.org/packages/ubuntu/ precise</pre> nginx<br>
+> deb-src <pre>http://nginx.org/packages/ubuntu/ precise</pre> nginx
 
 Execute the following commands will install the latest version: 
 <pre><code>
@@ -69,4 +69,5 @@ $ sudo service nginx start
 </code></pre>
 
 If no error shows up, then hoorary, you have successfully installed nginx server. Type `localost` in the browser address field, you should see a welcome page!
+
 
