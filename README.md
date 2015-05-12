@@ -36,3 +36,37 @@ It's pretty easy to run all the services on windows OS.
 ## For Linux
 The requirements are the same as on windows platforms, I will later write a detailed installation doc for both linux and window platforms.
 
+## Install Nginx (Ubuntu 12.04 64bit)
+
+Add key for the apt program:
+<pre><code>
+$ wget http://nginx.org/keys/nginx_signing.key
+$ sudo apt-key add nginx_signing.key
+</code></pre>
+
+Add repositories to the /etc/apt/sources.list file:
+<pre><code>
+$ sudo vim /etc/apt/sources.list
+</code></pre>
+
+> deb http://nginx.org/packages/ubuntu/ precise nginx
+> deb-src http://nginx.org/packages/ubuntu/ precise nginx
+
+Execute the following commands will install the latest version: 
+<pre><code>
+$ sudo apt-get update
+$ sudo apt-get install nginx
+</code></pre>
+
+BTW, the command below is to check nginx version:
+<pre><code>
+$ sudo apt-cache showpkg nginx
+</code></pre>
+
+Well, when the installation process is done, you could use the following command to run nginx server:
+<pre><code>
+$ sudo service nginx start
+</code></pre>
+
+If no error shows up, then hoorary, you have successfully installed nginx server. Type `localost` in the browser address field, you should see a welcome page!
+
