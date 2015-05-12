@@ -69,6 +69,26 @@ Well, when the installation process is done, you could use the following command
 $ sudo service nginx start
 </code></pre>
 
-If no error shows up, then hoorary, you have successfully installed nginx server. Type `localost` in the browser address field, you should see a welcome page!
+If no error shows up, then hooray, you have successfully installed nginx server. Type `localost` in the browser address field, you should see a welcome page!
 
+Now, configure nginx for your good. Edit `default.conf`:
+<pre><code>
+$ sudo vim /etc/nginx/conf.d/default.conf
+</code></pre>
+
+Modify <b>location</b> as follows:  
+>  location / {
+>        root   /path/to/gallery-ui;
+>        index  index.html index.htm;
+>  }
+
+Then restart nginx:
+<pre><code>
+$ sudo service nginx restart
+</code></pre>
+
+Try accessing `localhost` with your browser, you should see the following page.
+
+![Gallery Main Page](https://github.com/kevin-y/gallery-docs/blob/master/resources/images/gallery_main_page.png "Gallery Main Page")
+ 
 
