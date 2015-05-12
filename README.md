@@ -76,11 +76,11 @@ Now, configure nginx for your good. Edit `default.conf`:
 $ sudo vim /etc/nginx/conf.d/default.conf
 </code></pre>
 
-Modify <b>location</b> as follows:  
->  location / {
->        root   /path/to/gallery-ui;
->        index  index.html index.htm;
->  }
+Modify <b>location</b> bloc as follows:  
+>  location / {<br>
+>        root   /path/to/gallery-ui;<br>
+>        index  index.html index.htm;<br>
+>  }<br>
 
 Then restart nginx:
 <pre><code>
