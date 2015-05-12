@@ -6,6 +6,6 @@ The reason why I don't officially give it a particular name is just because I ha
 Well, I'll attempt to integrate more tools to provide powerful functionalities in the future.
 Please wait, :P!!!
 Below are some architectural perspectives:
-[![](https://github.com/kevin-y/gallery-docs/blob/master/Design/Architecture.png)]
+![Architecture](https://github.com/kevin-y/gallery-docs/blob/master/Design/Architecture.png)
 
 More information please see the **gallery-docs** project, it includes design, API and help docs. 
