@@ -7,7 +7,7 @@ import org.keviny.gallery.rdb.model.Account;
  */
 
 public interface AccountRepository {
-	public void saveAccount(Account acc);
-	public Account getAccountById(Integer id);
-	public Account getAccountByUsername(String username);
+	void saveAccount(Account acc);
+	Account getAccountById(Integer id);
+	Account getAccountByUsername(String username);
 }

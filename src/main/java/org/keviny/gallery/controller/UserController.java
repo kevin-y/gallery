@@ -64,7 +64,7 @@ public class UserController {
         Matcher m = p.matcher(id);
         if(m.matches()) {
         	params.put("id", Integer.parseInt(id));
-        	user = userRepository.get(Integer.parseInt(id));
+        	//user = userRepository.get(Integer.parseInt(id));
         } else {
             params.put("username", id);
             q.setParams(params);

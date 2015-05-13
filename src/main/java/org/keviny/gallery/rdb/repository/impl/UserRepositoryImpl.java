@@ -23,8 +23,7 @@ import org.springframework.util.Assert;
  */
 @Repository
 @Transactional
-public class UserRepositoryImpl extends RdbRepositorySupport<User> implements
-		UserRepository {
+public class UserRepositoryImpl implements UserRepository {
 	@PersistenceContext
 	private EntityManager em;
 	private static final String TABLE_NAME = Table.USER;

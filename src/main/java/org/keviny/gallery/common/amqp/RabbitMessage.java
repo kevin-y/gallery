@@ -1,4 +1,4 @@
-package org.keviny.gallery.common;
+package org.keviny.gallery.common.amqp;
 
 import java.util.HashMap;
 import java.util.Map;

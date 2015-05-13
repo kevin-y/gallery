@@ -13,8 +13,8 @@ import org.keviny.gallery.common.FileWrapper;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PictureRepository {
-	public Map<String, Object> storeFile(MultipartFile file);
-	public FileWrapper getFileById(ObjectId id);
-	public void storeFile(InputStream in, FileMetadata meta);
-	public void storeFile(byte[] b, FileMetadata meta);
+	Map<String, Object> storeFile(MultipartFile file);
+	FileWrapper getFileById(ObjectId id);
+	void storeFile(InputStream in, FileMetadata meta);
+	void storeFile(byte[] b, FileMetadata meta);
 }
