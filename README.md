@@ -194,12 +194,13 @@ Just follow along with this tutorial:
 
 <blockquote>
  <b>Note:</b><br>
-It may have a warning message saying: WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'<br>
+<pre><code>
+It may have a warning message saying: WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'
+You can eliminate this message by following these commands:
 
-You can eliminate this message by following these commands:<br>
-
-$ su - <br>
-# echo never > /sys/kernel/mm/transparent_hugepage/defrag <br>
+$ su -
+# echo never > /sys/kernel/mm/transparent_hugepage/defrag
+</code></pre>
 </blockquote>
 
 ## Install Tomcat 7.x+
