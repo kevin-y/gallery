@@ -10,11 +10,17 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.keviny.gallery.amqp.RabbitMessageService;
-import org.keviny.gallery.common.*;
+import org.keviny.gallery.common.Exchange;
+import org.keviny.gallery.common.FileMetadata;
+import org.keviny.gallery.common.FileWrapper;
+import org.keviny.gallery.common.RabbitMessage;
+import org.keviny.gallery.common.RoutingKey;
 import org.keviny.gallery.common.exception.ErrorCode;
 import org.keviny.gallery.common.exception.ErrorCodeException;
 import org.keviny.gallery.mongo.repository.PictureRepository;
 import org.keviny.gallery.util.ImageUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("api/pictures")
 public class PictureController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(PictureController.class);
 	private static final String[] supportedImageTypes = { "image/gif",
 			"image/jpeg", "image/png", "image/bmp" };
 
@@ -44,7 +51,11 @@ public class PictureController {
 	@ResponseBody
 	public ResponseEntity<FileMetadata> handlePictureUpload(
 			@RequestParam("file") MultipartFile image) {
-
+		
+		if(LOG.isDebugEnabled()) 
+			LOG.debug("Uploading file [ filename: {}, ContentType: {}, length: {}]", 
+					image.getOriginalFilename(), image.getContentType(), image.getSize());
+		
 		if (image.isEmpty()) {
 			throw new ErrorCodeException(ErrorCode.FILE_IS_EMPTY);
 		}
@@ -53,8 +64,7 @@ public class PictureController {
 			throw new ErrorCodeException(ErrorCode.CONTENT_TYPE_NOT_SUPPORTED);
 		}
 
-		FileMetadata meta = new FileMetadata(image.getOriginalFilename(),
-				image.getContentType());
+		FileMetadata meta = new FileMetadata(image.getOriginalFilename(), image.getContentType());
 		InputStream in = null;
 		try {
 			in = image.getInputStream();
@@ -69,15 +79,22 @@ public class PictureController {
 		if (meta.getFid() == null) {
 			throw new ErrorCodeException(ErrorCode.FILE_UPLOAD_FAILED);
 		}
-
+		
+		// Publish creation message
 		RabbitMessage message = new RabbitMessage();
 		message.setExchange(Exchange.IMAGE);
 		message.setRoutingKey(RoutingKey.NEW_IMAGE);
 		message.put("fid", meta.getFid());
 		message.put("filename", meta.getFilename());
-
+		message.put("contentType", meta.getContentType());
+		message.put("length", meta.getLength());
+		message.put("md5", meta.getMd5sum());
+		message.put("uploadTime", meta.getUploadTime());
 		rabbitMessageService.publish(message);
-
+		
+		if(LOG.isDebugEnabled())
+			LOG.debug("File `{}` has been stored successfully [fid: {}, contentType: {}, md5: {}, length: {}, uploadTime: {}]",
+					meta.getFilename(), meta.getFid(), meta.getContentType(), meta.getMd5sum(), meta.getLength(), meta.getUploadTime());
 		return new ResponseEntity<FileMetadata>(meta, status);
 	}
 
@@ -98,6 +115,9 @@ public class PictureController {
 			@RequestParam(value = "height", required = false, defaultValue = "0") Integer height,
 			@RequestParam(value = "quality", required = false, defaultValue = "1") Float quality) {
 		
+		if(LOG.isDebugEnabled())
+			LOG.debug("Fetch image: [file: {}, width: {}, height: {}, quality: {}]",
+					id.toString() + "." + ext, width, height, quality);
 		FileWrapper fw  = pictureRepository.getFileById(id);
 		byte[] b = fw.getData();
 		b = ImageUtils.scale(b, width, height, ext, quality);

@@ -1,6 +1,6 @@
 # Introduction
 
-Gallery is an open source demo project, anyone can copy and distribute it. If you want to use it for commercial product or any other purposes, it's okay, but without any guarantees. The initiative of making this demo is to separate things from my current work, but avail all of the skills I have obtained from 3 years of development.
+Gallery is an open source demo project, anyone can copy and distribute it. If you want to use it in commercial product or for any other purposes, it's okay, but without any guarantees. The initiative of making this demo is to separate things from my current work, but avail all of the skills I have obtained from 3 years of development.
 <br>It's built on plenty of open source tools, such as AngularJS, Bootstrap, jQuery, Spring Framework, RabbitMQ, Redis, MySQL, MongoDB, Nginx and Tomcat etc.
 <br>The reason why I don't officially give it a particular name is just because I have not come up with one yet, LOL.
 Well, I'll attempt to integrate more tools to provide powerful functionalities in the future.
@@ -31,7 +31,7 @@ It's pretty easy to run all the services on windows OS.
 	<li>Redis key-value server, well, redis windows version is not recommended for running in production environments, but for development purpose, it would not cause too much harm. I am using 2.18.19.1, see <a href="https://github.com/MSOpenTech/redis/releases" target="_blank">Redis 2.18.19.1</a></li>
 	<li>Tomcat 7.x+</li>
 	<li>MySQL 5.x, the latest version is recommended</li>
-	<li>Development tools, I am using maven to manage the project, so any IDE supports maven will work fine.</li>
+	<li>Development tools, I am using maven to manage the project, so any IDE supports maven will work fine.(Eclipse, Spring Tool Suite, IntelliJ IDEA etc.)</li>
 </ol> 
 
 ## For Linux

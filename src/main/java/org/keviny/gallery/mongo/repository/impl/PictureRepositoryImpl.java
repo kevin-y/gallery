@@ -86,9 +86,6 @@ public class PictureRepositoryImpl implements PictureRepository {
 		}
 	}
 	
-	
-
-	
 	public FileMetadata getFileList() {
 		return null;
 	}
