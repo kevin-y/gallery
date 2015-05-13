@@ -21,7 +21,7 @@ Please wait, :P!!!
 
 ## For windows
 It's pretty easy to run all the services on windows OS.
-**Requirements**
+<br>**Requirements**
 <ol>
 	<li>Windows XP, Vista, 7, 8, 8.1 and 10, both are okay, I'm using windows 7</li>
 	<li>Java JDK 1.6+, 1.7+ is recommended, because I will explore some features that only come up with 1.7.</li>
@@ -77,11 +77,12 @@ $ sudo vim /etc/nginx/conf.d/default.conf
 </code></pre>
 
 Modify <b>location</b> bloc as follows:  
->  location / {<br>
->        root   /path/to/gallery-ui;<br>
->        index  index.html index.htm;<br>
->  }<br>
-
+<pre><code>
+location / {
+    root   /path/to/gallery-ui;
+    index  index.html index.htm;
+}
+</code></pre>
 Then restart nginx:
 <pre><code>
 $ sudo service nginx restart
@@ -102,9 +103,10 @@ The following command is to check whether MySQL server is running on port 3306(b
 $ sudo lsof -i:3306
 </code></pre>
 
-
-> COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME <br>
-> mysqld  15580 mysql   10u  IPv4  63778      0t0  TCP localhost:mysql (LISTEN)
+<pre><code>
+ COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME <br>
+ mysqld  15580 mysql   10u  IPv4  63778      0t0  TCP localhost:mysql (LISTEN)
+</code></pre>
 
 ## Install Redis
 Before we start compiling redis source, we need to install gcc compiler if we haven't had one. The latest version is recommended. Here I am gonna install directly from the apt repository.
