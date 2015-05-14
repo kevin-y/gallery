@@ -23,10 +23,8 @@ import org.springframework.util.Assert;
  */
 @Repository
 @Transactional
-public class UserRepositoryImpl implements UserRepository {
-	@PersistenceContext
-	private EntityManager em;
-	private static final String TABLE_NAME = Table.USER;
+public class UserRepositoryImpl extends RdbRespositorySupport<User> implements UserRepository {
+
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void create(User user) {
@@ -35,7 +33,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	
-	public User findByUsername(final QueryBean q) {
+/*	public User findByUsername(final QueryBean q) {
 		Set<String> fields = q.getFields();
 		List<String> fieldList = null;
 		
@@ -54,22 +52,15 @@ public class UserRepositoryImpl implements UserRepository {
 		  .getResultList();
 		
 		return results.isEmpty() ? null : EntityUtils.getInstanceOf(results.get(0), fieldList, User.class);
-	}
-	
-	public User findOne(final QueryBean q) {
-		
-		
-		
-		return null;
-	}
-	
+	}*/
+
 	@Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
 	public User findByUsername(String username, Set<String> fields) {
 		//String fieldString = FieldUtils.forgeFieldString(fields, User.class);
 		return null;
 	}
 	
-	@Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
+	/*@Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
 	public User findByEmail(String email) {
 		String jpql = "SELECT u FROM " + TABLE_NAME + " u WHERE u.email=:email";
 		Query q = em.createQuery(jpql, User.class);
@@ -80,7 +71,7 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 		return null;
 	}
-	
+	*/
 	
 
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -98,5 +89,8 @@ public class UserRepositoryImpl implements UserRepository {
 
 	}
 
-	
+	@Override
+	public Class<User> getEntityClass() {
+		return User.class;
+	}
 }

@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.keviny.gallery.common.Pagination;
+import org.keviny.gallery.common.QueryBean;
 
 /**
  * Created by Kevin YOUNG on 2015/5/8.
  */
 
 public interface RdbRepository<T> {
-	void save(T entity);
+	/*void save(T entity);
 	void update(T entity);
 	void delete(Serializable id);
 	void deleteAll(Serializable... ids);
@@ -21,6 +22,8 @@ public interface RdbRepository<T> {
 	List<T> pageList(Pagination page, String eql, Map<String, Object> params);
 	long count();
 	long count(String eql);
-	long count(String eql, Map<String, Object> params);
+	long count(String eql, Map<String, Object> params);*/
+	T findOne(final QueryBean q);
+
 
 }

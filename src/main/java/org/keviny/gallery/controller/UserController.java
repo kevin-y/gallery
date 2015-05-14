@@ -57,22 +57,19 @@ public class UserController {
     	QueryBean q = new QueryBean();
     	q.setFields(fields);
     	Map<String, Object> params = new HashMap<String, Object>();
-    	
-    	
+
         User user = null;
         Pattern p = Pattern.compile(RegularExpression.DIGITS);
         Matcher m = p.matcher(id);
         if(m.matches()) {
         	params.put("id", Integer.parseInt(id));
-        	//user = userRepository.get(Integer.parseInt(id));
+        	user = userRepository.findOne(q);
         } else {
             params.put("username", id);
             q.setParams(params);
-            user = userRepository.findByUsername(q);
+            user = userRepository.findOne(q);
         }
-        
-       
-        
+
         if(user == null) {
         	Map<String, Object> error = new HashMap<String, Object>();
         	error.put("message", "Resource `api/users/" + id + "` does not exist!");
