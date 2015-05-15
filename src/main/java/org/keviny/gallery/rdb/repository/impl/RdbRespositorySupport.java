@@ -7,10 +7,11 @@ import org.keviny.gallery.util.FieldUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Query;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
@@ -41,17 +42,28 @@ public abstract class RdbRespositorySupport<T> implements RdbRepository<T> {
         // Build query string
         StringBuilder jql = new StringBuilder();
         jql.append("SELECT ").append(FieldUtils.join(fieldList, "o"))
-                .append(" FROM ").append(getTableName(entityClass)).append(" o")
-                .append(" WHERE");
-
-        for(String key : params.keySet()) {
-            jql.append(" ").append(key).append("=:").append(key);
+                .append(" FROM ").append(getTableName(entityClass)).append(" o");
+        
+        boolean hasParams = false;
+        
+        if(params != null && !params.isEmpty()) {
+        	jql.append(" WHERE");
+        	int count  = 0;
+            for(String key : params.keySet()) {
+               jql.append(" ").append(key).append("=:").append(key).append(" AND");
+               count++;
+            }
+            hasParams = count > 0;
+            if(count > 0) 
+            	jql.delete(jql.lastIndexOf("AND"), jql.length());
         }
 
-        Query query = em.createQuery(jql.toString(), Object[].class);
-        for(String key : params.keySet()) {
-            query.setParameter(key, params.get(key));
-        }
+        TypedQuery<Object[]> query = em.createQuery(jql.toString(), Object[].class);
+	    if(hasParams) {
+	    	for(String key : params.keySet()) {
+	    		query.setParameter(key, params.get(key));
+	    	}
+	    }  
         List<Object[]> results = query.getResultList();
         return results.isEmpty() ? null : EntityUtils.getInstanceOf(results.get(0), fieldList, entityClass);
     }

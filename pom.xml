@@ -8,7 +8,7 @@
     <properties>
 
 		<!-- Generic properties -->
-		<java.version>1.6</java.version>
+		<java.version>1.7</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<mongo.version>2.13.1</mongo.version>
@@ -16,8 +16,8 @@
 		<jackson.version>2.5.3</jackson.version>
 		<spring.mongo.version>1.7.0.RELEASE</spring.mongo.version>
 		<spring.rabbit.version>1.4.4.RELEASE</spring.rabbit.version>
-		<spring.redis.version>1.5.0.RELEASE</spring.redis.version>
-		<jedis.version>2.7.2</jedis.version>
+		<spring.redis.version>1.4.2.RELEASE</spring.redis.version>
+		<jedis.version>2.6.3</jedis.version>
 		<!-- Web -->
 		<jsp.version>2.2</jsp.version>
 		<jstl.version>1.2</jstl.version>

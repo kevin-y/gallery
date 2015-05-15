@@ -5,6 +5,7 @@
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:cache="http://www.springframework.org/schema/cache"
+  	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:aop="http://www.springframework.org/schema/aop"
@@ -116,15 +117,22 @@
 	</rabbit:listener-container>
 
    	<!-- Redis Configurations -->
-	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig" />					  
+	<!-- <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig" />		 -->			  
 	 <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
 	 	<property name="hostName" value="${redis.host}" />
 		<property name="port" value="${redis.port}" />
 		<property name="usePool" value="true" />
-		<property name="poolConfig" ref="jedisPoolConfig" />
+	<!-- 	<property name="poolConfig" ref="jedisPoolConfig" /> -->
 	 </bean>
-	 <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
-	 	   p:connection-factory-ref="jedisConnectionFactory"/>
+	
+	 <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnectionFactory"/>
+	  <!-- redis caching -->
+  	<cache:annotation-driven />
+  	<bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager" c:template-ref="redisTemplate">
+  		<property name="loadRemoteCachesOnStartup" value="true" />
+  		<property name="defaultExpiration" value="18000" />
+  	</bean>	   
+	
 
    	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
         <property name="maxUploadSize"  value="20000000" />  

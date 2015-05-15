@@ -287,7 +287,7 @@ public class User implements Serializable {
         this.loginFailedCount = loginFailedCount;
     }
 
-    public Boolean getLocked() {
+    public Boolean isLocked() {
         return locked;
     }
 
@@ -295,7 +295,7 @@ public class User implements Serializable {
         this.locked = locked;
     }
 
-    public Boolean getDeleted() {
+    public Boolean isDeleted() {
         return deleted;
     }
 
