@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
-@RequestMapping("api/pictures")
+@RequestMapping("/pictures")
 public class PictureController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PictureController.class);

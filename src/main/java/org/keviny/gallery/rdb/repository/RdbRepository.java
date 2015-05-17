@@ -23,7 +23,9 @@ public interface RdbRepository<T> {
 	long count();
 	long count(String eql);
 	long count(String eql, Map<String, Object> params);*/
-	T findOne(final QueryBean q);
-
-
+	public T findOne(final QueryBean q);
+	public List<T> find(final QueryBean q);
+    public long count(final QueryBean q);
+    public long count(final String jql);
+    public long count(final String jql, Map<String, Object> params);
 }

@@ -1,11 +1,14 @@
 package org.keviny.gallery.rdb.repository.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.keviny.gallery.common.QueryBean;
 import org.keviny.gallery.common.Table;
@@ -89,7 +92,25 @@ public class UserRepositoryImpl extends RdbRespositorySupport<User> implements U
 
 	}
 
-	@Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
+	public boolean hasEmailTaken(String email) {
+        final QueryBean q = new QueryBean();
+        Map<String, Object> params = new HashMap<>();
+        params.put("email", email);
+        q.setParams(params);
+		return (count(q) > 0);
+	}
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
+    public boolean hasUsernameTaken(String username) {
+        final QueryBean q = new QueryBean();
+        Map<String, Object> params = new HashMap<>();
+        params.put("username", username);
+        q.setParams(params);
+        return (count(q) > 0);
+    }
+
+    @Override
 	public Class<User> getEntityClass() {
 		return User.class;
 	}

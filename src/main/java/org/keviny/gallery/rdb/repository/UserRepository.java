@@ -8,8 +8,10 @@ import org.keviny.gallery.rdb.model.User;
  */
 
 public interface UserRepository extends RdbRepository<User> {
-    void create(User user);
-    void remove(Integer id);
-    void remove(String username);
-    void removeByEmail(String email);
+    public void create(User user);
+    public void remove(Integer id);
+    public void remove(String username);
+    public void removeByEmail(String email);
+    public boolean hasUsernameTaken(String username);
+    public boolean hasEmailTaken(String email);
 }

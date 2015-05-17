@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
@@ -25,9 +26,13 @@ public abstract class RdbRespositorySupport<T> implements RdbRepository<T> {
     @PersistenceContext
     protected EntityManager em;
 
-    @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
     public T findOne(final QueryBean q) {
+        List<T> list = find(q);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    public List<T> find(final QueryBean q) {
         Set<String> fields= q.getFields();
         Map<String, Object> params = q.getParams();
         List<String> fieldList;
@@ -43,29 +48,35 @@ public abstract class RdbRespositorySupport<T> implements RdbRepository<T> {
         StringBuilder jql = new StringBuilder();
         jql.append("SELECT ").append(FieldUtils.join(fieldList, "o"))
                 .append(" FROM ").append(getTableName(entityClass)).append(" o");
-        
+
         boolean hasParams = false;
-        
+
         if(params != null && !params.isEmpty()) {
-        	jql.append(" WHERE");
-        	int count  = 0;
+            jql.append(" WHERE");
+            int count  = 0;
             for(String key : params.keySet()) {
-               jql.append(" ").append(key).append("=:").append(key).append(" AND");
-               count++;
+                jql.append(" ").append(key).append("=:").append(key).append(" AND");
+                count++;
             }
             hasParams = count > 0;
-            if(count > 0) 
-            	jql.delete(jql.lastIndexOf("AND"), jql.length());
+            if(count > 0)
+                jql.delete(jql.lastIndexOf("AND"), jql.length());
         }
 
         TypedQuery<Object[]> query = em.createQuery(jql.toString(), Object[].class);
-	    if(hasParams) {
-	    	for(String key : params.keySet()) {
-	    		query.setParameter(key, params.get(key));
-	    	}
-	    }  
+        if(hasParams) {
+            for(String key : params.keySet()) {
+                query.setParameter(key, params.get(key));
+            }
+        }
+
         List<Object[]> results = query.getResultList();
-        return results.isEmpty() ? null : EntityUtils.getInstanceOf(results.get(0), fieldList, entityClass);
+        List<T> entityList = new ArrayList<T>();
+        for(Object[] result : results) {
+            T entity = EntityUtils.getInstanceOf(result, fieldList, entityClass);
+            entityList.add(entity);
+        }
+        return entityList;
     }
 
     public abstract Class<T> getEntityClass();
@@ -77,5 +88,51 @@ public abstract class RdbRespositorySupport<T> implements RdbRepository<T> {
         }
         Entity entityAnnotation = entityClass.getAnnotation(Entity.class);
         return entityAnnotation.name();
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
+    public long count(final QueryBean q) {
+        Map<String, Object> params = q.getParams();
+
+        StringBuilder jql = new StringBuilder();
+        jql.append("SELECT COUNT(*) FROM ")
+                .append(getTableName(getEntityClass()));
+
+        boolean hasParams = false;
+        if(params != null && !params.isEmpty()) {
+            jql.append(" WHERE");
+            int i  = 0;
+            for(String key : params.keySet()) {
+                jql.append(" ").append(key).append("=:").append(key).append(" AND");
+                i++;
+            }
+            hasParams = i > 0;
+            if(i > 0)
+                jql.delete(jql.lastIndexOf("AND"), jql.length());
+        }
+
+        TypedQuery<Long> query = em.createQuery(jql.toString(), Long.class);
+        if(hasParams) {
+            for(String key : params.keySet()) {
+                query.setParameter(key, params.get(key));
+            }
+        }
+        return query.getResultList().get(0);
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
+    public long count(final String jql) {
+        return count(jql, null);
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
+    public long count(final String jql, Map<String, Object> params) {
+        TypedQuery<Long> query = em.createQuery(jql,  Long.class);
+        if(params != null) {
+            for(String key : params.keySet()) {
+                query.setParameter(key, params.get(key));
+            }
+        }
+        return query.getResultList().get(0);
     }
 }

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/api/accounts")
+@RequestMapping("/accounts")
 public class AccountController {
 	@Resource
 	private AccountRepository accountRepository;

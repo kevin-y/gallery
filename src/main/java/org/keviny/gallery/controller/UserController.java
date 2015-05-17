@@ -1,9 +1,7 @@
 package org.keviny.gallery.controller;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,27 +13,28 @@ import org.keviny.gallery.rdb.model.User;
 import org.keviny.gallery.rdb.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by Kevin YOUNG on 2015/5/8.
  */
 
 @Controller
-@RequestMapping("api/users")
+@RequestMapping("/users")
 public class UserController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 	
-    @Resource
+    @Autowired
     private UserRepository userRepository;
+
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.GET,
@@ -92,4 +91,106 @@ public class UserController {
         return user;
     }
 
+
+	@RequestMapping(
+			value = "",
+			method = RequestMethod.GET,
+			produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	@ResponseBody
+	public List<User> list() {
+		QueryBean q = new QueryBean();
+		List<User> users = userRepository.find(q);
+		return  users;
+	}
+
+
+	@RequestMapping(
+			value = "/{id}",
+			method = RequestMethod.DELETE,
+			produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public Object delete(
+			@PathVariable("id") Integer id) {
+		//if(LOG.isDebugEnabled())
+		//	LOG.debug("Delete user " +  id);
+        System.out.println("Delete user " +  id);
+		return null;
+	}
+
+
+	@RequestMapping(
+			value = "/{id}/locked/{locked}",
+			method = RequestMethod.PUT,
+			produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public Object lockOrUnlock(
+			@PathVariable("id") Integer id,
+			@PathVariable("locked") Boolean locked) {
+		//if(LOG.isDebugEnabled())
+		//LOG.debug("User " + id + " " + (locked ? "locked" : "unlocked"));
+        System.out.println("User " + id + " " + (locked ? "locked" : "unlocked"));
+		return null;
+	}
+
+
+	@RequestMapping(
+			value = "/login",
+			consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+			method = RequestMethod.POST
+	)
+	@ResponseBody
+	public ResponseEntity login(
+			@RequestParam("username") String username,
+			@RequestParam("password") String password) throws Exception {
+
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setLocation(new URI("/"));
+
+		return new ResponseEntity(headers, HttpStatus.MOVED_PERMANENTLY);
+	}
+
+	@RequestMapping(
+			value = "/register",
+			consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+			method = RequestMethod.POST
+	)
+    @ResponseBody
+	public Object register(
+			@RequestParam(value = "email", required = true) String email,
+			@RequestParam(value = "password", required = true) String password) {
+
+        boolean hasTaken = userRepository.hasEmailTaken(email);
+        Map<String, Object> result =  new HashMap<>();
+        if(hasTaken) {
+            result.put("email", email);
+            result.put("message", "This email is not available");
+        }
+        return result;
+	}
+
+    @RequestMapping(
+            value = "/{field}/exists",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    public Object exists(
+            @PathVariable("field") String field,
+            @RequestParam("type") String type) {
+
+        Map<String, Object> result = new HashMap<>();
+        boolean hasTaken = false;
+        if(type.equalsIgnoreCase("EMAIL")) {
+            hasTaken = userRepository.hasEmailTaken(field);
+            result.put("hasTaken", hasTaken);
+        } else if(type.equalsIgnoreCase("USERNAME")) {
+            hasTaken = userRepository.hasUsernameTaken(field);
+            result.put("hasTaken", hasTaken);
+        } else {
+            result.put("message", "Unknown type `" + type + "`");
+        }
+        return result;
+    }
 }
