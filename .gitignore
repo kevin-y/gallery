@@ -87,6 +87,6 @@ local.properties
 
 # target
 **/target/
-
+target/
 ### STS ###
 .springBeans
