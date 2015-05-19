@@ -118,14 +118,13 @@ public class MailUtils {
 	            message.setSubject("This is the Subject Line!");
 
 	            // Send the actual HTML message, as big as you like
-	            message.setContent("test",
-	                    "text/html" );
+	            message.setContent("test", "text/html");
 
 	            // Send message
 	            Transport.send(message);
 	            System.out.println("Sent message successfully....");
-	        }catch (MessagingException mex) {
-	            mex.printStackTrace();
+	        }catch (MessagingException e) {
+	            e.printStackTrace();
 	        }
 	}
 
@@ -142,7 +141,7 @@ public class MailUtils {
         final String username = "test@example.com";
         final String password = "test";
 
-        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+        Session session = Session.getInstance(props, new Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(username, password);
 			}
