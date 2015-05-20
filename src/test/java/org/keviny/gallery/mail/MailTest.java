@@ -17,18 +17,19 @@ public class MailTest {
 	@Before
 	public void init() {
 		mailFactory = new SimpleMailFactory();
-		mailFactory.setDefaultAuthenticator(new DefaultAuthenticator("test@example.com", "password"));
+        // This is a test account
+		mailFactory.setDefaultAuthenticator(new DefaultAuthenticator("kevin_young0@aol.com", "a123456B"));
 		Properties props = new Properties();
 		// SMTP
 		props.setProperty("mail.smtp.auth", "true");
 		props.setProperty("mail.smtp.starttls.enable", "true");
-		props.setProperty("mail.smtp.host", "smtpHost");
-		props.setProperty("mail.smtp.port", "465");
-		props.put("mail.smtp.socketFactory.port", "465");
+		props.setProperty("mail.smtp.host", "smtp.aol.com");
+		props.setProperty("mail.smtp.port", "587");
+		props.put("mail.smtp.socketFactory.port", "587");
 		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		
 		// POP3
-		props.put("mail.pop3.host", "smtpHost");
+		props.put("mail.pop3.host", "pop.aol.com");
 		props.put("mail.pop3.port", "995");
 		props.put("mail.pop3.starttls.enable", "true");
 		props.put("mail.pop3.socketFactory.port", "995");
@@ -40,7 +41,7 @@ public class MailTest {
 	public void testMailSender() {
 		MailSender mailSender = mailFactory.getMailSender();
 		MailMessage mm = new MailMessage();
-		mm.setRecipient("test@example.com");
+		mm.setRecipient("kings988@163.com");
 		mm.setSubject("Important meetings");
 		mm.setContent("This is a test message.");
 		mailSender.send(mm);
