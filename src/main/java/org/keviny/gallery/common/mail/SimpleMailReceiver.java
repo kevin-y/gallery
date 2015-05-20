@@ -1,13 +1,24 @@
 package org.keviny.gallery.common.mail;
 
-import javax.mail.*;
 import java.io.IOException;
 import java.util.Properties;
+
+import javax.mail.FetchProfile;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.UIDFolder;
+import javax.mail.internet.MimeMultipart;
+
+import com.sun.mail.pop3.POP3Folder;
 
 /**
  * Created by kevin on 5/19/15.
  */
-public class SimpleMailReceiver implements Receiver {
+public class SimpleMailReceiver implements MailReceiver {
 
 
     private static final String MAIL_POP3_HOST = "mail.pop3.host";
@@ -26,7 +37,17 @@ public class SimpleMailReceiver implements Receiver {
 
     private Properties pop3Properties;
     private DefaultAuthenticator defaultAuthenticator;
+    private MailStore mailStore;
 
+    public SimpleMailReceiver() {
+    	
+    }
+    
+    public SimpleMailReceiver(Properties pop3Properties, DefaultAuthenticator defaultAuthenticator) {
+    	this.pop3Properties = pop3Properties;
+    	this.defaultAuthenticator = defaultAuthenticator;
+    }
+    
     public Properties getPop3Properties() {
         return pop3Properties;
     }
@@ -60,31 +81,31 @@ public class SimpleMailReceiver implements Receiver {
             Store store = session.getStore("pop3s");
             store.connect(props.getProperty(MAIL_POP3_HOST), defaultAuthenticator.getUsername(), defaultAuthenticator.getPassword());
             //create the folder object and open it
-            Folder emailFolder = store.getFolder("INBOX");
-            emailFolder.open(Folder.READ_ONLY);
-
-            Message[] messages = emailFolder.getMessages();
-            System.out.println("messages.length---" + messages.length);
-
+            POP3Folder inbox = (POP3Folder)store.getFolder("INBOX");
+            
+            inbox.open(Folder.READ_ONLY);
+            FetchProfile profile = new FetchProfile();
+            profile.add(UIDFolder.FetchProfileItem.UID);
+            Message[] messages = inbox.getMessages();
+            inbox.fetch(messages,profile);
+            mailStore = new DefaultMailStore();
             for (int i = 0, n = messages.length; i < n; i++) {
-                Message message = messages[i];
-                System.out.println("---------------------------------");
-                System.out.println("Email Number " + (i + 1));
-                System.out.println("Subject: " + message.getSubject());
-                System.out.println("From: " + message.getFrom()[0]);
-                System.out.println("Text: " + message.getContent().toString());
+                String uid = inbox.getUID(messages[i]);
+                if(mailStore.isUnread(uid)) {
+                	// save mail to db/file
+                	Message message = inbox.getMessage(i + 1);
+                	mailStore.store(message);
+                }
 
             }
 
             //close the store and folder objects
-            emailFolder.close(false);
+            inbox.close(false);
             store.close();
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
         } catch (MessagingException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } 
     }
 }

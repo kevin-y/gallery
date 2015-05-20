@@ -1,6 +1,5 @@
 package org.keviny.gallery.common.mail;
 
-import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -11,8 +10,7 @@ import java.util.Properties;
 /**
  * Created by kevin on 5/19/15.
  */
-public class SimpleMailSender implements Sender {
-
+public class SimpleMailSender implements MailSender {
 
     private static final String MAIL_SMTP_HOST = "mail.smtp.host";
     private static final String MAIL_SMTP_STARTTTLS_ENABLE = "mail.smtp.starttls.enable";
@@ -31,6 +29,15 @@ public class SimpleMailSender implements Sender {
     private Properties smtpProperties;
     private DefaultAuthenticator defaultAuthenticator;
 
+    public SimpleMailSender() {
+    	
+    }
+    
+    public SimpleMailSender(Properties smtpProperties, DefaultAuthenticator defaultAuthenticator) {
+    	this.smtpProperties = smtpProperties;
+    	this.defaultAuthenticator = defaultAuthenticator;
+    }
+    
     public Properties getSmtpProperties() {
         return smtpProperties;
     }
@@ -65,6 +72,7 @@ public class SimpleMailSender implements Sender {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(mailMessage.getRecipient()));
             message.setSubject(mailMessage.getSubject());
             message.setContent(mailMessage.getContent(), "text/html");
+            message.setHeader("X-Priority", "1");
             Transport.send(message);
         } catch (Exception e) {
             e.printStackTrace();

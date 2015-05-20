@@ -11,6 +11,15 @@ public class DefaultAuthenticator extends Authenticator {
     private String username;
     private String password;
 
+    public DefaultAuthenticator() {
+    	
+    }
+    
+    public DefaultAuthenticator(String username, String password) {
+    	this.username = username;
+    	this.password = password;
+    }
+    
     protected PasswordAuthentication getPasswordAuthentication() {
         return new PasswordAuthentication(username, password);
     }
