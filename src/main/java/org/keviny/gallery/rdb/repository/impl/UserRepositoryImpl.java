@@ -101,6 +101,15 @@ public class UserRepositoryImpl extends RdbRespositorySupport<User> implements U
 		return (count(q) > 0);
 	}
 
+    @Override
+    public String getSimilarUsername(String username) {
+        String jql = "SELECT o.username FROM users o WHERE o.username LIKE :username ORDER BY o.username DESC";
+        TypedQuery<String> query = em.createQuery(jql, String.class);
+        query.setParameter("username", username);
+        List<String> usernames = query.getResultList();
+        return usernames.isEmpty() ? null : usernames.get(0);
+    }
+
     @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
     public boolean hasUsernameTaken(String username) {
         final QueryBean q = new QueryBean();

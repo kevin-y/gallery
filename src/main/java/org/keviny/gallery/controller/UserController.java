@@ -170,14 +170,37 @@ public class UserController {
 			@RequestParam(value = "email", required = true) String email,
 			@RequestParam(value = "password", required = true) String password) {
 
+        // check validity of email
+
+        // check if email is available
         boolean hasTaken = userRepository.hasEmailTaken(email);
+
         Map<String, Object> result =  new HashMap<>();
         result.put("email", email);
+        HttpStatus status = HttpStatus.OK;
         if(hasTaken) {
             result.put("message", "This email is not available");
+            status = HttpStatus.CONFLICT;
         }
-        result.put("password", getEncryptedPassword(password));
-        return result;
+
+        String username = email.split("@")[0];
+        String similarUsername = userRepository.getSimilarUsername(username);
+        if(similarUsername != null) {
+            String num = similarUsername.substring(similarUsername.lastIndexOf(username));
+            username = username + (Integer.parseInt(num) + 1);
+        }
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(getEncryptedPassword(password));
+        user.setGender('N');
+        user.setEmail(email);
+        user.setLocked(false);
+        user.setVerified(false);
+        String verificationCode = RandomUtils.getRandomString(8);
+        user.setVerificationCode(verificationCode);
+        userRepository.create(user);
+
+        return new ResponseEntity<Object>(result, status);
 	}
 
     @RequestMapping(
