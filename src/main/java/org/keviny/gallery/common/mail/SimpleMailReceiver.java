@@ -1,6 +1,5 @@
 package org.keviny.gallery.common.mail;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import javax.mail.FetchProfile;
@@ -11,7 +10,6 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.UIDFolder;
-import javax.mail.internet.MimeMultipart;
 
 import com.sun.mail.pop3.POP3Folder;
 

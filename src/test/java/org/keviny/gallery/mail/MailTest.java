@@ -1,49 +1,39 @@
 package org.keviny.gallery.mail;
 
-import java.util.Properties;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.keviny.gallery.common.mail.DefaultAuthenticator;
+import org.junit.runner.RunWith;
+import org.keviny.gallery.amqp.RabbitMessageService;
+import org.keviny.gallery.common.amqp.RabbitMessage;
 import org.keviny.gallery.common.mail.MailFactory;
 import org.keviny.gallery.common.mail.MailMessage;
 import org.keviny.gallery.common.mail.MailReceiver;
 import org.keviny.gallery.common.mail.MailSender;
-import org.keviny.gallery.common.mail.SimpleMailFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({"classpath:mvc-config.xml"})
 public class MailTest {
+	@Autowired
 	private MailFactory mailFactory;
-
-	@Before
-	public void init() {
-		mailFactory = new SimpleMailFactory();
-        // This is a test account
-		mailFactory.setDefaultAuthenticator(new DefaultAuthenticator("kevin_young0@aol.com", "a123456B"));
-		Properties props = new Properties();
-		// SMTP
-		props.setProperty("mail.smtp.auth", "true");
-		props.setProperty("mail.smtp.starttls.enable", "true");
-		props.setProperty("mail.smtp.host", "smtp.aol.com");
-		props.setProperty("mail.smtp.port", "587");
-		props.put("mail.smtp.socketFactory.port", "587");
-		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		
-		// POP3
-		props.put("mail.pop3.host", "pop.aol.com");
-		props.put("mail.pop3.port", "995");
-		props.put("mail.pop3.starttls.enable", "true");
-		props.put("mail.pop3.socketFactory.port", "995");
-        props.put("mail.pop3.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        mailFactory.setProperties(props);
-	}
-
+	@Autowired
+	private RabbitMessageService rabbitMessageService;
+	
+	
 	@Test
 	public void testMailSender() {
 		MailSender mailSender = mailFactory.getMailSender();
 		MailMessage mm = new MailMessage();
-		mm.setRecipient("kings988@163.com");
+		Set<String> recipients = new HashSet<String>();
+		recipients.add("kings988@163.com");
+		recipients.add("craaazy123@163.com");
+		mm.setRecipients(recipients);
 		mm.setSubject("Important meetings");
-		mm.setContent("This is a test message.");
+		mm.setContent("Everyone please attend on time!!!");
 		mailSender.send(mm);
 	}
 	
@@ -51,5 +41,25 @@ public class MailTest {
 	public void testMailReceiver() {
 		MailReceiver mailReceiver = mailFactory.getMailReceiver();
 		mailReceiver.receive();		
+	}
+	
+	@Test
+	public void testAsynMailSending() {
+		RabbitMessage<MailMessage> message = new RabbitMessage<MailMessage>();
+		MailMessage mm = new MailMessage();
+		Set<String> recipients = new HashSet<String>();
+		recipients.add("kings988@163.com");
+		recipients.add("craaazy123@163.com");
+		mm.setRecipients(recipients);
+		mm.setSubject("Kevin's github repository");
+		String content = "Bellow's the link:<br>"
+					   + "<a href=\"https://github.com/kevin-y/gallery\">Kevin's github repository</a><br>"
+					   + "Sample image:<br>"
+					   + "<img src=\"http://www.ipaddesk.com/uploadfile/2013/0118/20130118104739919.jpg\" title=\"Architecture\" alt=\"Architecture\">";
+		mm.setContent(content);
+		message.setExchange("gallery.mail");
+		message.setRoutingKey("gallery.mail.send");
+		message.setBody(mm);
+		rabbitMessageService.publish(message);
 	}
 }

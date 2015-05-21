@@ -4,36 +4,47 @@ import java.util.Properties;
 
 public class SimpleMailFactory implements MailFactory {
 
-	private Properties props;
-	private DefaultAuthenticator defaultAuthenticator;
+	private Properties properties;
+	private DefaultAuthenticator defaultSmtpAuthenticator;
+	private DefaultAuthenticator defaultPop3Authenticator;
 
 	public Properties getProperties() {
-		return props;
+		return properties;
 	}
 
-	public void setProperties(Properties props) {
-		this.props = props;
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 
-	public DefaultAuthenticator getDefaultAuthenticator() {
-		return defaultAuthenticator;
+	public DefaultAuthenticator getDefaultSmtpAuthenticator() {
+		return defaultSmtpAuthenticator;
 	}
 
-	public void setDefaultAuthenticator(DefaultAuthenticator defaultAuthenticator) {
-		this.defaultAuthenticator = defaultAuthenticator;
+	public void setDefaultSmtpAuthenticator(
+			DefaultAuthenticator defaultSmtpAuthenticator) {
+		this.defaultSmtpAuthenticator = defaultSmtpAuthenticator;
+	}
+
+	public DefaultAuthenticator getDefaultPop3Authenticator() {
+		return defaultPop3Authenticator;
+	}
+
+	public void setDefaultPop3Authenticator(
+			DefaultAuthenticator defaultPop3Authenticator) {
+		this.defaultPop3Authenticator = defaultPop3Authenticator;
 	}
 
 	public MailSender getMailSender() {
 		SimpleMailSender mailSender = new SimpleMailSender();
-		mailSender.setDefaultAuthenticator(defaultAuthenticator);
-		mailSender.setSmtpProperties(props);
+		mailSender.setDefaultAuthenticator(defaultSmtpAuthenticator);
+		mailSender.setSmtpProperties(properties);
 		return mailSender;
 	}
 
 	public MailReceiver getMailReceiver() {
 		SimpleMailReceiver mailReceiver = new SimpleMailReceiver();
-		mailReceiver.setDefaultAuthenticator(defaultAuthenticator);
-		mailReceiver.setPop3Properties(props);
+		mailReceiver.setDefaultAuthenticator(defaultPop3Authenticator);
+		mailReceiver.setPop3Properties(properties);
 		return mailReceiver;
 	}
 

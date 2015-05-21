@@ -11,6 +11,8 @@ import org.keviny.gallery.common.QueryBean;
 import org.keviny.gallery.common.RegularExpression;
 import org.keviny.gallery.rdb.model.User;
 import org.keviny.gallery.rdb.repository.UserRepository;
+import org.keviny.gallery.util.MessageDigestUtils;
+import org.keviny.gallery.util.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -70,7 +73,6 @@ public class UserController {
         } else {
             params.put("username", id);
         }
-        params.put("deleted", false);
         //params.put("locked", false);
         q.setParams(params);
         user = userRepository.findOne(q);
@@ -140,15 +142,22 @@ public class UserController {
 			method = RequestMethod.POST
 	)
 	@ResponseBody
-	public ResponseEntity login(
+	public ResponseEntity<Void> login(
 			@RequestParam("username") String username,
 			@RequestParam("password") String password) throws Exception {
 
-
 		HttpHeaders headers = new HttpHeaders();
 		headers.setLocation(new URI("/"));
-
-		return new ResponseEntity(headers, HttpStatus.MOVED_PERMANENTLY);
+		final QueryBean q = new QueryBean();
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("username", username);
+		q.setParams(params);
+		User user = userRepository.findOne(q);
+		if(user == null) { // user doesn't exist
+			// TODO
+		}
+		
+		return new ResponseEntity<Void>(headers, HttpStatus.MOVED_PERMANENTLY);
 	}
 
 	@RequestMapping(
@@ -163,10 +172,11 @@ public class UserController {
 
         boolean hasTaken = userRepository.hasEmailTaken(email);
         Map<String, Object> result =  new HashMap<>();
+        result.put("email", email);
         if(hasTaken) {
-            result.put("email", email);
             result.put("message", "This email is not available");
         }
+        result.put("password", getEncryptedPassword(password));
         return result;
 	}
 
@@ -192,5 +202,12 @@ public class UserController {
             result.put("message", "Unknown type `" + type + "`");
         }
         return result;
+    }
+    
+    private String getEncryptedPassword(String password) {
+		String salt = RandomUtils.getRandomString();
+		MessageDigestUtils md5 = MessageDigestUtils.getInstance("md5");
+		String md5Str = md5.encode(Base64Utils.encodeToString((password + salt).getBytes()));
+		return (md5Str + ":" + salt);
     }
 }

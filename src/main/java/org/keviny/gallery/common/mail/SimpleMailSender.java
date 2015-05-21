@@ -1,11 +1,13 @@
 package org.keviny.gallery.common.mail;
 
-import javax.mail.Message;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.mail.Message.RecipientType;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Properties;
 
 /**
  * Created by kevin on 5/19/15.
@@ -69,8 +71,12 @@ public class SimpleMailSender implements MailSender {
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(defaultAuthenticator.getUsername()));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(mailMessage.getRecipient()));
+            Set<String> recipients = mailMessage.getRecipients();
+            for(String recipient : recipients) {
+            	message.addRecipient(RecipientType.TO, new InternetAddress(recipient));
+            }
             message.setSubject(mailMessage.getSubject());
+            // For now only supports `text/html`
             message.setContent(mailMessage.getContent(), "text/html");
             message.setHeader("X-Priority", "1");
             Transport.send(message);

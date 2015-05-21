@@ -30,9 +30,9 @@ public class MessageDigestUtils {
 		int length = b.length;
 		char[] s = new char[length << 1];
 		for(int i = 0; i < length; i++) {
-			//取出高四位
+			//high 4 bits
 			s[i << 1] = ch[b[i] >>> 4 & 0xF];
-			//取出低四位
+			//low 4 bits
 			s[(i << 1) + 1] = ch[b[i] & 0xF];
 		}
 		return new String(s);

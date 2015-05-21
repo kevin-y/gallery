@@ -6,13 +6,15 @@ package org.keviny.gallery.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.keviny.gallery.amqp.RabbitMessageService;
-import org.keviny.gallery.common.amqp.Exchange;
 import org.keviny.gallery.common.FileMetadata;
 import org.keviny.gallery.common.FileWrapper;
+import org.keviny.gallery.common.amqp.Exchange;
 import org.keviny.gallery.common.amqp.RabbitMessage;
 import org.keviny.gallery.common.amqp.RoutingKey;
 import org.keviny.gallery.common.exception.ErrorCode;
@@ -81,15 +83,17 @@ public class PictureController {
 		}
 		
 		// Publish creation message
-		RabbitMessage message = new RabbitMessage();
+		RabbitMessage<Map<String, Object>> message = new RabbitMessage<>();
 		message.setExchange(Exchange.IMAGE);
 		message.setRoutingKey(RoutingKey.NEW_IMAGE);
-		message.put("fid", meta.getFid());
-		message.put("filename", meta.getFilename());
-		message.put("contentType", meta.getContentType());
-		message.put("length", meta.getLength());
-		message.put("md5", meta.getMd5sum());
-		message.put("uploadTime", meta.getUploadTime());
+		Map<String, Object> m = new HashMap<>();
+		m.put("fid", meta.getFid());
+		m.put("filename", meta.getFilename());
+		m.put("contentType", meta.getContentType());
+		m.put("length", meta.getLength());
+		m.put("md5", meta.getMd5sum());
+		m.put("uploadTime", meta.getUploadTime());
+		message.setBody(m);
 		rabbitMessageService.publish(message);
 		
 		if(LOG.isDebugEnabled())

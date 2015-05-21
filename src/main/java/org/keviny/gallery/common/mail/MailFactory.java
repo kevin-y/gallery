@@ -7,9 +7,11 @@ import java.util.Properties;
  */
 public interface MailFactory {
 	public Properties getProperties();
-	public void setProperties(Properties props);
-	public DefaultAuthenticator getDefaultAuthenticator();
-	public void setDefaultAuthenticator(DefaultAuthenticator defaultAuthenticator);
+	public void setProperties(Properties properties);
+	public DefaultAuthenticator getDefaultSmtpAuthenticator();
+	public void setDefaultSmtpAuthenticator(DefaultAuthenticator defaultSmtpAuthenticator);
+	public DefaultAuthenticator getDefaultPop3Authenticator();
+	public void setDefaultPop3Authenticator(DefaultAuthenticator defaultPop3Authenticator);
     public MailSender getMailSender();
     public MailReceiver getMailReceiver();
 }

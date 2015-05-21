@@ -31,7 +31,7 @@ public class User implements Serializable {
     private String middleName;
     @Column(name = "last_name", length = 10)
     private String lastName;
-    @Ignore
+   // @Ignore
     @Column(name = "passwd", nullable = false, length = 40)
     private String password;
     @Column(name = "email", nullable = false, unique = true, length = 80)
@@ -70,15 +70,19 @@ public class User implements Serializable {
     private String street;
     @Column(name = "postcode", length = 10)
     private String postcode;
+    // @Column(name = "login_count", nullable = false)
     @Column(name = "login_count")
     private Integer loginCount;
+    // @Column(name = "login_failed_count", nullable = false)
     @Column(name = "login_failed_count")
     private Integer loginFailedCount;
-    @Column(name = "locked", length = 1, nullable = false)
+    @Column(name = "is_email_verified", nullable = false, length = 1)
+    private Boolean verified;
+    @Column(name = "email_verification_code", nullable = false, length = 6)
+    private String verificationCode;
+    @Column(name = "locked", nullable = false, length = 1)
     private Boolean locked;
-    @Column(name = "deleted", length = 1, nullable = false)
-    private Boolean deleted;
-
+  
     public Integer getId() {
         return id;
     }
@@ -295,11 +299,19 @@ public class User implements Serializable {
         this.locked = locked;
     }
 
-    public Boolean isDeleted() {
-        return deleted;
-    }
+	public String getVerificationCode() {
+		return verificationCode;
+	}
 
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
+	public void setVerificationCode(String verificationCode) {
+		this.verificationCode = verificationCode;
+	}
+
+	public Boolean isVerified() {
+		return verified;
+	}
+
+	public void setVerified(Boolean verified) {
+		this.verified = verified;
+	}   
 }

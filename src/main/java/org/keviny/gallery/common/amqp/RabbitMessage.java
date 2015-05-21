@@ -1,15 +1,12 @@
 package org.keviny.gallery.common.amqp;
 
-import java.util.HashMap;
-import java.util.Map;
 
-public class RabbitMessage {
+public class RabbitMessage<T> {
 	private String exchange;
 	private String routingKey;
-	private Map<String, Object> body;
+	private T body;
 
 	public RabbitMessage() {
-		this.body = new HashMap<String, Object>();
 	}
 
 	public String getExchange() {
@@ -28,11 +25,11 @@ public class RabbitMessage {
 		this.routingKey = routingKey;
 	}
 
-	public Map<String, Object> getBody() {
+	public T getBody() {
 		return body;
 	}
 
-	public void put(String key, Object value) {
-		body.put(key, value);
+	public void setBody(T body) {
+		this.body = body;
 	}
 }
