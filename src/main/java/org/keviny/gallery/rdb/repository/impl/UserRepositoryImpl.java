@@ -105,7 +105,7 @@ public class UserRepositoryImpl extends RdbRespositorySupport<User> implements U
     public String getSimilarUsername(String username) {
         String jql = "SELECT o.username FROM users o WHERE o.username LIKE :username ORDER BY o.username DESC";
         TypedQuery<String> query = em.createQuery(jql, String.class);
-        query.setParameter("username", username);
+        query.setParameter("username", username + "%");
         List<String> usernames = query.getResultList();
         return usernames.isEmpty() ? null : usernames.get(0);
     }

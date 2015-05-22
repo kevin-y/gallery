@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.keviny.gallery.common.mail.MailFactory;
 import org.keviny.gallery.common.mail.MailMessage;
 import org.keviny.gallery.common.mail.MailSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Component
 public class MailMessageHandler implements MessageListener {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(MailMessageHandler.class);
+	
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -29,8 +34,13 @@ public class MailMessageHandler implements MessageListener {
            // simply ignore the message
            if(mail.getRecipients().isEmpty()) return;           
            MailSender sender = mailFactory.getMailSender();
+           if(LOG.isDebugEnabled())
+        	   LOG.debug("Sending email...");
+           System.out.println(mail.getRecipients().toArray()[0]);
            sender.send(mail);
+           System.out.println("Sent");
         } catch (IOException e) {
+        	e.printStackTrace();
         }
     }
 }

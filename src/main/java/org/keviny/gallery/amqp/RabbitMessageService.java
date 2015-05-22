@@ -19,6 +19,7 @@ public class RabbitMessageService {
 	private static final Logger LOG = LoggerFactory.getLogger(RabbitMessageService.class);
 
 	public void publish(final RabbitMessage<?> message) {
+		System.out.println("--------------------------------------------------");
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -32,6 +33,7 @@ public class RabbitMessageService {
 				if(LOG.isDebugEnabled()) 
 					LOG.debug("Publishing message[ Exechange: {}, RoutingKey: {} ]",
 								message.getExchange(),  message.getRoutingKey());
+				System.out.println("testeststsetstststststststs");
 				amqpTemplate.convertAndSend(exchange, routingKey, body);
 			}
 		});

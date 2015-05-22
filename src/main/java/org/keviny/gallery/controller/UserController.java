@@ -1,14 +1,20 @@
 package org.keviny.gallery.controller;
 
 import java.net.URI;
-import java.util.*;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Resource;
-
+import org.keviny.gallery.amqp.RabbitMessageService;
 import org.keviny.gallery.common.QueryBean;
 import org.keviny.gallery.common.RegularExpression;
+import org.keviny.gallery.common.amqp.RabbitMessage;
+import org.keviny.gallery.common.mail.MailMessage;
 import org.keviny.gallery.rdb.model.User;
 import org.keviny.gallery.rdb.repository.UserRepository;
 import org.keviny.gallery.util.MessageDigestUtils;
@@ -23,7 +29,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Base64Utils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Created by Kevin YOUNG on 2015/5/8.
@@ -37,6 +47,8 @@ public class UserController {
 	
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RabbitMessageService rabbitMessageService;
 
     @RequestMapping(
             value = "/{id}",
@@ -186,9 +198,9 @@ public class UserController {
         String username = email.split("@")[0];
         String similarUsername = userRepository.getSimilarUsername(username);
         if(similarUsername != null) {
-            String num = similarUsername.substring(similarUsername.lastIndexOf(username));
-            username = username + (Integer.parseInt(num) + 1);
+        	username = buildAvailabeUsername(similarUsername);
         }
+        
         User user = new User();
         user.setUsername(username);
         user.setPassword(getEncryptedPassword(password));
@@ -199,7 +211,27 @@ public class UserController {
         String verificationCode = RandomUtils.getRandomString(8);
         user.setVerificationCode(verificationCode);
         userRepository.create(user);
-
+        result.put("user", user);
+        
+        MailMessage mm = new MailMessage();
+        Set<String> recipients = new HashSet<String>();
+        recipients.add(email);
+        mm.setRecipients(recipients);
+        mm.setSubject("Kevin's Galley: Please activate your account!");
+        
+        String content = "Bellow's the link:<br>"
+				   + "<a href=\"http://localhost:8080/gallery/users/activate?email=" + email + "&code=" + verificationCode + "\">Kevin's github repository</a><br>"
+				   + "Sample image:<br>"
+				   + "<img src=\"http://www.ipaddesk.com/uploadfile/2013/0118/20130118104739919.jpg\" title=\"Architecture\" alt=\"Architecture\">";
+        mm.setContent(content);
+        //mm.setContent("http://localhost:8080/gallery/activate?email=" + email + "&code=" + verificationCode);
+        RabbitMessage<MailMessage> rm = new RabbitMessage<MailMessage>();
+        
+        rm.setExchange("gallery.mail");
+        rm.setRoutingKey("gallery.mail.send");
+        rm.setBody(mm);
+        rabbitMessageService.publish(rm);
+        
         return new ResponseEntity<Object>(result, status);
 	}
 
@@ -227,10 +259,63 @@ public class UserController {
         return result;
     }
     
-    private String getEncryptedPassword(String password) {
+    @RequestMapping(
+            value = "/activate",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    public ResponseEntity<Object> activate(@RequestParam(value = "email", required = true) String email,
+    		@RequestParam(value = "code", required = true) String code) {
+    	Map<String, Object> m = new HashMap<String, Object>();
+    	m.put("email", email);
+    	m.put("code", code);
+    	Map<String, Object> params = new HashMap<String, Object>();
+    	m.put("email", email);
+    	QueryBean q = new QueryBean();
+    	q.setParams(params);
+    	User user = userRepository.findOne(q);
+    	if(user == null) {
+    		// TODO: user doesn't exists
+    	}
+    	if(code.equals(user.getVerificationCode())) {
+    		Timestamp now = new Timestamp(System.currentTimeMillis());
+    		if(user.getVcodeExpiresIn().after(now)) {
+    			// verification succeeded
+    			// TODO
+    		}
+    	}
+    	return new ResponseEntity<Object>(m, HttpStatus.OK);
+    }
+    
+    private static String getEncryptedPassword(String password) {
 		String salt = RandomUtils.getRandomString();
 		MessageDigestUtils md5 = MessageDigestUtils.getInstance("md5");
 		String md5Str = md5.encode(Base64Utils.encodeToString((password + salt).getBytes()));
 		return (md5Str + ":" + salt);
     }
+    
+    private static String buildAvailabeUsername(String s) {
+    	int len = s.length();
+    	char[] chs = s.toCharArray();
+    	int i = len - 1;
+    	StringBuilder digits = new StringBuilder();
+    	for( ; i >= 0; i--) {
+    		if(chs[i] >= 48 && chs[i] <= 57)
+    			digits.append(chs[i]);
+    		else 
+    			break;
+    	}
+    	String username = s.substring(0, i + 1);
+    	if(digits.length() > 0)
+    		username = username + (Integer.parseInt(digits.toString()) + 1);
+    	else 
+    		username += "0";
+    	return username;
+    }
+   
+    
+    public static void main(String[] args) {
+    	
+	}
 }
