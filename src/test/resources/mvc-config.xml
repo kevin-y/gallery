@@ -144,7 +144,7 @@
     </bean>  
 
 	<!-- Mail Configurations -->
-	<context:property-placeholder location="file:///d:/project/mail.properties" order="0" ignore-unresolvable="true"/>
+	<context:property-placeholder location="file:///home/kevin/project/mail.properties" order="0" ignore-unresolvable="true"/>
 	
 	<bean id="defaultSmtpAuthenticator" class="org.keviny.gallery.common.mail.DefaultAuthenticator">
 		<property name="username" value="${mail.smtp.user}" />

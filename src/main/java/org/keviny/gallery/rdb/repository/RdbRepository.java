@@ -28,4 +28,5 @@ public interface RdbRepository<T> {
     public long count(final QueryBean q);
     public long count(final String jql);
     public long count(final String jql, Map<String, Object> params);
+    public void updateSpecifiedFields(final QueryBean q, final Map<String, Object> values);
 }

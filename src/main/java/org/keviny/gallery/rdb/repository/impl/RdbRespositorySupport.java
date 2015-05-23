@@ -6,11 +6,9 @@ import org.keviny.gallery.util.EntityUtils;
 import org.keviny.gallery.util.FieldUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -134,5 +132,40 @@ public abstract class RdbRespositorySupport<T> implements RdbRepository<T> {
             }
         }
         return query.getResultList().get(0);
+    }
+
+    public void updateSpecifiedFields(final QueryBean q, final Map<String, Object> values) {
+        Assert.notEmpty(values);
+        StringBuilder jql = new StringBuilder("UPDATE ");
+        //jql.append(getTableName(getEntityClass()))
+        jql.append("users")
+                .append(" SET ");
+
+        for(String key : values.keySet()) {
+            jql.append(key).append("=:").append(key).append(",");
+        }
+        // delete last comma
+        jql.delete(jql.lastIndexOf(","), jql.length());
+
+
+        Map<String, Object> params = q.getParams();
+        if(params != null && !params.isEmpty()) {
+            jql.append(" WHERE ");
+            for(String key : params.keySet()) {
+                // using `_` to distinguish params and values
+                jql.append(key).append("=:_").append(key).append(" AND ");
+            }
+            jql.delete(jql.lastIndexOf("AND"), jql.length());
+        }
+
+        Query query = em.createQuery(jql.toString());
+        for(String key : values.keySet()) {
+            query.setParameter(key, values.get(key));
+        }
+
+        for(String key : params.keySet()) {
+            query.setParameter("_" + key, params.get(key));
+        }
+        query.executeUpdate();
     }
 }

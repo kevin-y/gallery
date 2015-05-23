@@ -1,5 +1,6 @@
 package org.keviny.gallery.rdb.repository.impl;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,11 +102,18 @@ public class UserRepositoryImpl extends RdbRespositorySupport<User> implements U
 		return (count(q) > 0);
 	}
 
-    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
     public String getSimilarUsername(String username) {
-        String jql = "SELECT o.username FROM users o WHERE o.username LIKE :username ORDER BY o.username DESC";
-        TypedQuery<String> query = em.createQuery(jql, String.class);
+        StringBuilder jql = new StringBuilder("SELECT o.username FROM ");
+        jql.append(getTableName(getEntityClass()))
+           .append(" o WHERE o.username LIKE :username ORDER BY o.username DESC");
+
+        TypedQuery<String> query = em.createQuery(jql.toString(), String.class);
         query.setParameter("username", username + "%");
+        // only fetch one record
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+
         List<String> usernames = query.getResultList();
         return usernames.isEmpty() ? null : usernames.get(0);
     }
@@ -118,6 +126,14 @@ public class UserRepositoryImpl extends RdbRespositorySupport<User> implements U
         q.setParams(params);
         return (count(q) > 0);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void update(User user) {
+        em.find(getEntityClass(), user.getId());
+        em.merge(user);
+    }
+
+
 
     @Override
 	public Class<User> getEntityClass() {
