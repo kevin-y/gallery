@@ -14,6 +14,7 @@ import org.keviny.gallery.amqp.RabbitMessageService;
 import org.keviny.gallery.common.QueryBean;
 import org.keviny.gallery.common.RegularExpression;
 import org.keviny.gallery.common.amqp.RabbitMessage;
+import org.keviny.gallery.common.bean.PasswordResetBean;
 import org.keviny.gallery.common.mail.MailMessage;
 import org.keviny.gallery.rdb.model.User;
 import org.keviny.gallery.rdb.repository.UserRepository;
@@ -29,7 +30,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Base64Utils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,8 +63,7 @@ public class UserController {
     public User getUser(
     		@PathVariable("id") String id,
     		@RequestParam(value = "_field", required = false) String _field,
-    		@RequestParam(value = "_callback", required = false) String _callback
-    ) {
+    		@RequestParam(value = "_callback", required = false) String _callback) {
     	if (LOG.isDebugEnabled()) 
     		LOG.debug("Fetch user with id: " + id);
     	Set<String> fields = null;
@@ -141,16 +143,21 @@ public class UserController {
 	public Object lockOrUnlock(
 			@PathVariable("id") Integer id,
 			@PathVariable("locked") Boolean locked) {
-		//if(LOG.isDebugEnabled())
-		//LOG.debug("User " + id + " " + (locked ? "locked" : "unlocked"));
+		if(LOG.isDebugEnabled())
+			LOG.debug("User " + id + " " + (locked ? "locked" : "unlocked"));
         System.out.println("User " + id + " " + (locked ? "locked" : "unlocked"));
 		return null;
 	}
 
-
-
-
-
+	@RequestMapping(
+		value = "/reset_password", 
+		method = RequestMethod.PUT,
+		produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public void resetPasword(@Validated @RequestBody PasswordResetBean prb) {
+		
+	}
+	
     @RequestMapping(
             value = "/{field}/exists",
             method = RequestMethod.GET,

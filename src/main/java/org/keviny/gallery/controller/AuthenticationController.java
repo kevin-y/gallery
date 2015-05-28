@@ -1,8 +1,17 @@
 package org.keviny.gallery.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.keviny.gallery.amqp.RabbitMessageService;
 import org.keviny.gallery.common.QueryBean;
 import org.keviny.gallery.common.amqp.RabbitMessage;
+import org.keviny.gallery.common.bean.PasswordResetBean;
 import org.keviny.gallery.common.exception.ErrorCode;
 import org.keviny.gallery.common.exception.ErrorCodeException;
 import org.keviny.gallery.common.mail.MailMessage;
@@ -17,14 +26,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Base64Utils;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Created by kevin on 5/23/15.
@@ -36,7 +43,7 @@ public class AuthenticationController {
     private UserRepository userRepository;
     @Autowired
     private RabbitMessageService rabbitMessageService;
-
+   
     @RequestMapping(
             value = "/login",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
@@ -125,11 +132,10 @@ public class AuthenticationController {
         mm.setSubject("Kevin's Galley: Please activate your account!");
 
         String content = "Bellow's the link:<br>"
-                + "<a href=\"http://localhost:8080/gallery/activate?email=" + email + "&code=" + verificationCode + "\">Kevin's github repository</a><br>"
+                + "<a href=\"http://localhost:8080/gallery/activation?email=" + email + "&code=" + verificationCode + "\">Kevin's github repository</a><br>"
                 + "Sample image:<br>"
                 + "<img src=\"http://www.ipaddesk.com/uploadfile/2013/0118/20130118104739919.jpg\" title=\"Architecture\" alt=\"Architecture\">";
         mm.setContent(content);
-        //mm.setContent("http://localhost:8080/gallery/activate?email=" + email + "&code=" + verificationCode);
         RabbitMessage<MailMessage> rm = new RabbitMessage<MailMessage>();
 
         rm.setExchange("gallery.mail");
@@ -141,17 +147,16 @@ public class AuthenticationController {
     }
 
     @RequestMapping(
-            value = "/activate",
+            value = "/verification",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public void activate(@RequestParam(value = "email", required = true) String email,
-                         @RequestParam(value = "code", required = true) String code) {
+    public ResponseEntity<Void> verify(@RequestParam(value = "email", required = true) String email,
+                         @RequestParam(value = "code", required = true) String code) throws URISyntaxException {
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("email", email);
-        m.put("code", code);
+        m.put("verificationCode", code);
         Map<String, Object> params = new HashMap<String, Object>();
         m.put("email", email);
         final QueryBean q = new QueryBean();
@@ -159,24 +164,27 @@ public class AuthenticationController {
         User user = userRepository.findOne(q);
         if(user == null)
             throw new ErrorCodeException(ErrorCode.USER_DOES_NOT_EXIST);
+        
+        // email hasn't been verified
+        if(!user.isVerified()) { 
+        	 // check if verification code has or hasn't expired
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            if(!user.getVcodeExpiresIn().after(now))
+                throw new ErrorCodeException(ErrorCode.VERIFICATION_CODE_HAS_EXPIRED);
 
-        if(user.isVerified()) { // email has already been verified
-            return;
+            if(!code.equals(user.getVerificationCode()))
+                throw new ErrorCodeException(ErrorCode.INVALID_VERIFICATION_CODE);
+
+            Map<String, Object> values = new HashMap<>();
+            values.put("verified", true);
+            userRepository.updateSpecifiedFields(q, values);
         }
 
-        // check if verification code has or hasn't expired
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        if(!user.getVcodeExpiresIn().after(now))
-            throw new ErrorCodeException(ErrorCode.VERIFICATION_CODE_HAS_EXPIRED);
-
-        if(!code.equals(user.getVerificationCode()))
-            throw new ErrorCodeException(ErrorCode.INVALID_VERIFICATION_CODE);
-
-        Map<String, Object> values = new HashMap<>();
-        values.put("verified", true);
-        userRepository.updateSpecifiedFields(q, values);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(new URI("/"));
+        return new ResponseEntity<Void>(headers, HttpStatus.PERMANENT_REDIRECT);
     }
-
+    
     // useful methods
     private static String getEncryptedPassword(String password) {
             return getEncryptedPassword(password, null);
