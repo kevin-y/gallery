@@ -85,6 +85,12 @@
 	<mongo:mapping-converter id="mappingConverter" />
 	<mongo:gridFsTemplate db-factory-ref="mongoDbFactory" converter-ref="mappingConverter"/>
 
+    <bean id="mongoFactory" class="org.keviny.gallery.common.mongo.MongoFactory">
+        <constructor-arg name="mongo" ref="mongo" />
+        <constructor-arg name="username" value="${mongo.user}" />
+        <constructor-arg name="password" value="${mongo.password}" />
+    </bean>
+
    	<!-- RabbitMQ Configurations -->
 	<rabbit:annotation-driven />
    	<rabbit:connection-factory id="rabbitConnectionFactory" requested-heartbeat="20" host="${rabbit.host}"

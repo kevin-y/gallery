@@ -5,4 +5,8 @@ package org.keviny.gallery.common;
  */
 public class Collection {
     public static final String GLOBAL_FILE_STORAGE = "GlobalFileStorage";
+    public static final String MAIL_TEMPLATE = "mail.template";
+    public static final String USER_LOG = "user.log";
+    public static final String SYSTEM_LOG = "system.log";
+
 }

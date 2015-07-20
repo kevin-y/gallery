@@ -79,13 +79,20 @@
     <tx:annotation-driven transaction-manager="transactionManager" />
     
     <!-- MongoDB Configurations -->
-    <mongo:mongo  host="${mongo.host}" port="${mongo.port}" />
+    <mongo:mongo host="${mongo.host}" port="${mongo.port}" />
 	<mongo:db-factory mongo-ref="mongo" dbname="FILE_STORAGE_db" username="${mongo.user}" password="${mongo.password}" />
 	<mongo:template  db-factory-ref="mongoDbFactory"/>
 	<mongo:mapping-converter id="mappingConverter" />
 	<mongo:gridFsTemplate db-factory-ref="mongoDbFactory" converter-ref="mappingConverter"/>
 
-   	<!-- RabbitMQ Configurations -->
+    <bean id="mongoFactory" class="org.keviny.gallery.common.mongo.MongoFactory">
+        <constructor-arg name="mongo" ref="mongo" />
+        <constructor-arg name="username" value="${mongo.user}" />
+        <constructor-arg name="password" value="${mongo.password}" />
+    </bean>
+
+
+    <!-- RabbitMQ Configurations -->
 	<rabbit:annotation-driven />
    	<rabbit:connection-factory id="rabbitConnectionFactory" requested-heartbeat="20" host="${rabbit.host}"
 		port="${rabbit.port}" username="${rabbit.user}" password="${rabbit.password}" />
@@ -144,7 +151,7 @@
     </bean>  
 
 	<!-- Mail Configurations -->
-	<context:property-placeholder location="file:///home/kevin/project/mail.properties" order="0" ignore-unresolvable="true"/>
+	<context:property-placeholder location="classpath:mail.properties" order="0" ignore-unresolvable="true"/>
 	
 	<bean id="defaultSmtpAuthenticator" class="org.keviny.gallery.common.mail.DefaultAuthenticator">
 		<property name="username" value="${mail.smtp.user}" />
